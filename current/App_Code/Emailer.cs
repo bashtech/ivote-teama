@@ -1,3 +1,12 @@
+/// <summary>
+/// Created by: Adam Blank, emailer.cs, 9/23/2011
+/// generic emailer class that sends an email through the server.
+/// 
+/// Modified in Spring 2012 to allow for external configuration 
+/// of SMTP server connection.
+/// 
+/// </summary>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,14 +14,6 @@ using System.Web;
 using System.Configuration;
 using System.Net.Mail;
 
-
-/// <summary>
-/// Created by: Adam Blank, emailer.cs, 9/23/2011
-/// generic emailer class that sends an email through the server.
-/// 
-/// Last modified: 2/23/2012
-/// </summary>
-/// 
 
 public class emailer
 {

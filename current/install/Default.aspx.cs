@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Spring 2012
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -19,11 +27,14 @@ public partial class install_Default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         CheckConfiguration();
-        baseUrlStatus.Text = Server.MapPath("Faculty.accdb");
     }
 
+    /// <summary>
+    /// Check the validity of configuration parameters in settings.config
+    /// </summary>
     private void CheckConfiguration()
     {
+        //Get configuration parameters
         string baseUrl = System.Configuration.ConfigurationManager.AppSettings["baseUrl"];
         string mysqlHost = System.Configuration.ConfigurationManager.AppSettings["mysqlHost"];
         string mysqlUser = System.Configuration.ConfigurationManager.AppSettings["mysqlUser"];
@@ -35,7 +46,8 @@ public partial class install_Default : System.Web.UI.Page
         string smtpUser = System.Configuration.ConfigurationManager.AppSettings["smtpUser"];
         string smtpPassword = System.Configuration.ConfigurationManager.AppSettings["smtpPassword"];
         string smtpEnableSSL = System.Configuration.ConfigurationManager.AppSettings["smtpEnableSSL"];
-
+        
+        //Checks basic status 
         if (!String.IsNullOrEmpty(baseUrl))
         {
             baseUrlStatus.Text = baseUrl;
@@ -169,11 +181,22 @@ public partial class install_Default : System.Web.UI.Page
         }
 
     }
+
+    /// <summary>
+    /// Handles button click to recheck status
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void checkSettings_Click(object sender, EventArgs e)
     {
         CheckConfiguration();
     }
 
+    /// <summary>
+    /// Handles button click to create initial database schema
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void createScheme_Click(object sender, EventArgs e)
     {
         //Legacy
@@ -187,6 +210,7 @@ public partial class install_Default : System.Web.UI.Page
         ISession session = DatabaseEntities.NHibernateHelper.CreateSessionFactory().OpenSession();
         ITransaction transaction = session.BeginTransaction();
 
+        //Create contract committees
         Committee newCommittee = new Committee();
         newCommittee.Name = "Sabbatical Leave Committee";
         newCommittee.Description = "The Sabbatical Leave Committee receives applications for sabbatical and forwards recommendations to the University President.";
@@ -217,13 +241,20 @@ public partial class install_Default : System.Web.UI.Page
         createScheme.Enabled = false;
     }
 
+    /// <summary>
+    /// Handles button click to create initial admin user
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void createUser_Click(object sender, EventArgs e)
     {
         if (!Page.IsValid)
             return;
+
         ISession session = DatabaseEntities.NHibernateHelper.CreateSessionFactory().OpenSession();
         ITransaction transaction = session.BeginTransaction();
 
+        //Creates admin user with specified email and password with admin priviledges
         DatabaseEntities.User user = new DatabaseEntities.User();
         user.FirstName = "Default";
         user.LastName = "Admin";
@@ -249,6 +280,11 @@ public partial class install_Default : System.Web.UI.Page
         createUser.Enabled = false;
     }
 
+    /// <summary>
+    /// Handles button to import users from Faculty.accdb
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     protected void importUsers_Click(object sender, EventArgs e)
     {
         ISession session = NHibernateHelper.CreateSessionFactory().OpenSession();

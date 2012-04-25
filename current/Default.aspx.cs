@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;

@@ -1,4 +1,13 @@
-﻿// Membershp Provider coded with guide from MSDN: http://msdn.microsoft.com/en-us/library/6tc47t75(VS.80).aspx
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Modifications in Spring 2012
+ * to use NHibernate backend
+ * 
+ */
 using System.Configuration.Provider;
 using System.Collections.Specialized;
 using System;
@@ -40,14 +49,12 @@ public class iVoteLoginProvider : MembershipProvider
     private int maxInvalidAttempts = 10;
     private int maxAttemptLockWindow = 5;
     private MembershipPasswordFormat format;
-
     private MachineKeySection machineKey;
 
 
     public iVoteLoginProvider()
     {
         Configuration config = WebConfigurationManager.OpenWebConfiguration(System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);
-        //machineKey = (MachineKeySection)config.GetSection("system.web/machineKey");
     }
 
     private string GetConfigValue(string configValue, string defaultValue)

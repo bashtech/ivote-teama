@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Modifications in Spring 2012
+ * to use NHibernate backend
+ * and remove time-based elections
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;

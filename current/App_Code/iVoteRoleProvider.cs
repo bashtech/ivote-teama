@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Modifications in Spring 2012
+ * to use NHibernate backend
+ * 
+ */
+
+using System;
 using System.Data;
 using System.Configuration;
 using System.Linq;

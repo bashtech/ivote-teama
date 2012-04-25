@@ -3,7 +3,9 @@
 /// Created by Adam Blank, 9/17/2011, databaseLogic.cs
 /// Database for iVote system for CSC354
 /// 
-/// Last modified: 2/27/2012 by Andrew
+/// Modified in Spring 2012 to remove
+/// obsolete functionality infavor of
+/// NHibernate backend
 /// 
 /// </summary> 
 

@@ -1,3 +1,14 @@
+/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Modifications in Spring 2012
+ * to use NHibernate backend
+ * 
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +93,7 @@ public partial class Account_Register : System.Web.UI.Page
                 SuccessPanel.Visible = true;
                 ConflictPanel.Visible = false;
                 
+                //Clear fields to make easier to create additional users
                 FirstName.Text = "";
                 LastName.Text = "";
                 Email.Text = "";

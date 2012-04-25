@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Existing functionality ported
+ * to officer_election.aspx.cs
+ * in Spring 2012
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;

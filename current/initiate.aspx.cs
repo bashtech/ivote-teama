@@ -1,12 +1,22 @@
-﻿using System;
+﻿/*
+ * 
+ * Created by iVote Team A
+ * 
+ * Fall 2011
+ * 
+ * Modifications in Spring 2012
+ * to use NHibernate backend
+ * and remove timeline
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
-//Created by Adam Blank for CSC 354
 
 public partial class initiate : System.Web.UI.Page
 {
