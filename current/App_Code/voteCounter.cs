@@ -160,14 +160,17 @@ public class voteCounter
     // this will be used for getting the total votes for the position
     protected void setTotalVotesForPosition()
     {
+        totalForPosition = 0;
         for(int i = 0; i < ds.Tables[0].Rows.Count; i++)
         {
-            totalForPosition += (int)ds.Tables[0].Rows[i].ItemArray[2];
+            totalForPosition += Convert.ToInt32(ds.Tables[0].Rows[i].ItemArray[2]);
         }
     }
 
     protected void setParalellArrays()
     {
+        userIDs.Clear();
+        userVotes.Clear();
         for(int i = 0; i < ds.Tables[0].Rows.Count; i++)
         {
             userIDs.Add(ds.Tables[0].Rows[i].ItemArray[0]);
