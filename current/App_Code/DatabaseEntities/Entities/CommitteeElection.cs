@@ -76,7 +76,7 @@ namespace DatabaseEntities
         public virtual bool SpecialElection { get; set; }
 
         // Methods
-        
+
         /// <summary>
         /// Returns the election which is running for the specified committee.
         /// </summary>
@@ -229,7 +229,8 @@ namespace DatabaseEntities
                 // Put the users into the correct committee.
                 Dictionary<string, int> winners = GetResults(session);
                 List<User> winningUsers = new List<User>();
-                foreach (string email in winners.Keys) {
+                foreach (string email in winners.Keys)
+                {
                     User u = User.FindUser(session, email);
                     u.CurrentCommittee = PertinentCommittee;
                     session.SaveOrUpdate(u);
@@ -267,7 +268,7 @@ namespace DatabaseEntities
         public virtual ElectionPhase NextPhase(ISession session)
         {
             ElectionPhase toReturn = this.Phase;
-            if(toReturn != ElectionPhase.ClosedPhase)
+            if (toReturn != ElectionPhase.ClosedPhase)
                 toReturn += 1;
             if (toReturn == ElectionPhase.NominationPhase &&
                 this.ShouldEnterNominationPhase(session) == false)
@@ -361,7 +362,7 @@ namespace DatabaseEntities
             List<ElectionConflict> conflicts = ElectionConflict.FindElectionConflicts(session, ID);
             foreach (ElectionConflict conflict in conflicts)
                 NHibernateHelper.Delete(session, conflict);
-            
+
             ITransaction transaction = session.BeginTransaction();
             // Get the current committee
             Committee committee = Committee.FindCommittee(session, PertinentCommittee);
@@ -388,6 +389,15 @@ namespace DatabaseEntities
                 secID.Add(i.ID);
             }
 
+            //List departments of nominees
+            List<DepartmentType> departmentsWinning = new List<DepartmentType>();
+            List<int> secIDWinning = new List<int>();
+            foreach (User i in winningUsers)
+            {
+                departmentsWinning.Add(i.Department);
+                secIDWinning.Add(i.ID);
+            }
+
             // For each user who won, add a new conflict if their department
             // is already present on the list. Adding, departments as we go.
             // Also raise conflicts if the winning users hold officer positions,
@@ -407,12 +417,25 @@ namespace DatabaseEntities
                 }
 
                 // check for department-based conflicts
-                if(departments.Contains(i.Department))
+                if (departments.Contains(i.Department))
                 {
                     ElectionConflict conflict = new ElectionConflict();
                     conflict.Election = ID;
                     conflict.FirstUser = i.ID;
                     conflict.SecUser = secID[departments.IndexOf(i.Department)];
+                    conflict.Type = ConflictType.TooManyDeptMembers;
+                    session.SaveOrUpdate(conflict);
+                }
+
+                // check for department-based conflicts - nominees
+                if (departmentsWinning.Contains(i.Department) && i.ID != secIDWinning[departmentsWinning.IndexOf(i.Department)])
+                {
+                    ElectionConflict conflict = new ElectionConflict();
+                    conflict.Election = ID;
+                    conflict.FirstUser = i.ID;
+                    conflict.SecUser = secIDWinning[departmentsWinning.IndexOf(i.Department)];
+                    secIDWinning.Remove(conflict.SecUser);
+                    departmentsWinning.Remove(i.Department);
                     conflict.Type = ConflictType.TooManyDeptMembers;
                     session.SaveOrUpdate(conflict);
                 }
@@ -435,7 +458,7 @@ namespace DatabaseEntities
 
             // Count nominations for each user.
             foreach (DatabaseEntities.User aUser in users)
-                if(aUser != null)
+                if (aUser != null)
                     nomCount.Add(aUser.ID, 0);
 
             List<CommitteeWTSNomination> nominations =
@@ -449,34 +472,36 @@ namespace DatabaseEntities
             Committee committee = Committee.FindCommittee(session, this.PertinentCommittee);
             count.Sort();
             count.Reverse();
-            
+
             int cutOff = -1;
             if (count.Count != 0) // vacancies times 2 minus 1 to make it zero based...
             {
                 int num_vacs = committee.NumberOfVacancies(session) * 2 - 1;
-                if(num_vacs >= count.Count)
+                if (num_vacs >= count.Count)
                     cutOff = -1;
                 else
-                    cutOff = count[Math.Min(num_vacs, count.Count - 1)];
+                    cutOff = count[Math.Max(num_vacs, count.Count - 1)];
             }
-            
+
             // Only add users to the list of nominees if they surpass the cutoff value
             List<User> ret = new List<User>();
             foreach (User user in users)
             {
-                if(user == null)
+                if (user == null)
                     continue;
                 if (nomCount[user.ID] >= cutOff)
                     ret.Add(user);
             }
             return ret;
         }
-        
-        public virtual int DaysRemainingInPhase(ISession session) {
+
+        public virtual int DaysRemainingInPhase(ISession session)
+        {
             return (int)this.NextPhaseDate(session, false).Subtract(PhaseStarted).TotalDays;
         }
-        
-        public virtual int RealDaysRemainingInPhase(ISession session) {
+
+        public virtual int RealDaysRemainingInPhase(ISession session)
+        {
             return (int)this.NextPhaseDate(session, true).Subtract(PhaseStarted).TotalDays;
         }
 
@@ -503,7 +528,7 @@ namespace DatabaseEntities
             }
 
             // Find all the BallotEntries
-            List<BallotEntry> ballotEntries = 
+            List<BallotEntry> ballotEntries =
                 BallotEntry.FindBallotEntry(session, ID);
             foreach (BallotEntry entry in ballotEntries)
             {
@@ -522,7 +547,7 @@ namespace DatabaseEntities
         {
             // Find the committeeWTS.
             List<CommitteeWTS> cWTSes = CommitteeWTS.FindCommitteeWTS(session, ID);
-            foreach(CommitteeWTS cWTS in cWTSes)
+            foreach (CommitteeWTS cWTS in cWTSes)
                 NHibernateHelper.Delete(session, cWTS);
 
             // Find all the WTSNominations
@@ -540,16 +565,16 @@ namespace DatabaseEntities
             List<BallotFlag> ballotFlags = BallotFlag.FindBallotFlags(session, ID);
             foreach (BallotFlag flag in ballotFlags)
                 NHibernateHelper.Delete(session, flag);
-            
+
             // Find all the conflicts
             List<ElectionConflict> conflicts = ElectionConflict.FindElectionConflicts(session, ID);
             foreach (ElectionConflict conflict in conflicts)
                 NHibernateHelper.Delete(session, conflict);
-            
+
             // Delete the election.
             NHibernateHelper.Delete(session, this);
         }
-        
+
         /// <summary>
         /// Generates a pdf of election results for this election.
         /// </summary>
@@ -558,13 +583,13 @@ namespace DatabaseEntities
         /// <returns>The document which was created.</returns>
         public virtual Document GenerateResultsPDF(ISession session, string path)
         {
-            Committee committee = Committee.FindCommittee(session, 
+            Committee committee = Committee.FindCommittee(session,
                 PertinentCommittee);
             List<Certification> certifications = Certification.FindCertifications(session, ID);
             Dictionary<string, int> users = GetResults(session);
 
             var doc = new Document();
-            PdfWriter.GetInstance(doc, 
+            PdfWriter.GetInstance(doc,
                 new FileStream(path, FileMode.Create));
 
             PdfPTable table = new PdfPTable(2);
@@ -584,7 +609,7 @@ namespace DatabaseEntities
             doc.Open();
             Font header = FontFactory.GetFont("Arial", 24, BaseColor.BLACK);
             doc.Add(new Phrase("APSCUF-KU Election Results\n", header));
-            
+
             // The semester the election was started during
             string semester = "nothing";
 
@@ -597,12 +622,12 @@ namespace DatabaseEntities
                 Started <= new DateTime(Started.Year, 5, 12))
                 semester = " held during the Spring " + Started.Year.ToString() + " semester.";
             else // otherwise just say what date it started.
-                semester = " started on " + Started.ToString("d") + "."; 
+                semester = " started on " + Started.ToString("d") + ".";
 
             doc.Add(new Paragraph("The following results were collected during an election held to fill " + committee.NumberOfVacancies(session).ToString() + " vacancies in the " + committee.Name + semester));
             doc.Add(table);
 
-            foreach(Certification i in certifications)
+            foreach (Certification i in certifications)
             {
                 User certifyingUser = User.FindUser(session, i.User);
                 Chunk sigLine = new Chunk("                                                  \n");
@@ -633,10 +658,10 @@ namespace DatabaseEntities
                             .Add(Restrictions.Eq("Election", ID))
                             .List<CommitteeWTS>().ToList<CommitteeWTS>();
             List<CommitteeWTS> final_wtses = new List<CommitteeWTS>();
-            foreach(CommitteeWTS wts in wtses)
-                if(User.FindUser(session, wts.User) != null)
+            foreach (CommitteeWTS wts in wtses)
+                if (User.FindUser(session, wts.User) != null)
                     final_wtses.Add(wts);
-            
+
             // return that list
             return final_wtses;
         }
